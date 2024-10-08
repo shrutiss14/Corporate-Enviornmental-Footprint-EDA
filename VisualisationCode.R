@@ -6,6 +6,8 @@ library(scales)
 
 data<-read.csv("C:\\Users\\sharm\\OneDrive\\Desktop\\Visu Project\\final_raw_sample_0_percent.csv")
 
+#data cleaning
+
 data <- data %>%
   rename("Company Name"="Company.Name",
          "Exiobase industry category" = "Industry..Exiobase.",
@@ -41,6 +43,9 @@ data <- data %>%
 
 data <- na.omit(data)
 
+#data visualisation
+
+#plot1
 ggplot(data, aes(x = `Total Environmental Intensity in % (Revenue)`)) +
   geom_histogram(binwidth = 0.5,fill="lightblue",color="black",alpha=0.7) +
   labs(title = "Distribution of Total Environmental Intensity (Revenue)",
@@ -49,6 +54,7 @@ ggplot(data, aes(x = `Total Environmental Intensity in % (Revenue)`)) +
   theme(axis.title.x = element_text(margin = margin(t = 10)),  
         axis.title.y = element_text(margin = margin(r = 10)))
 
+#plot2
 ggplot(data, aes(x = `Total Environmental Intensity in % (Operating Income)`)) +
   geom_histogram(binwidth = 0.5,fill = "seagreen1", color = "black", alpha = 0.7) +
   labs(title = "Distribution of Total Environmental Intensity (Operating Income)",
@@ -57,6 +63,7 @@ ggplot(data, aes(x = `Total Environmental Intensity in % (Operating Income)`)) +
   theme(axis.title.x = element_text(margin = margin(t = 10)),  
         axis.title.y = element_text(margin = margin(r = 10)))
 
+#plot3
 ggplot(data, aes(x = `Year`, y = `Total Environmental Cost`)) +
   geom_line(stat = "summary", fun = "mean",color="slateblue4") +
   scale_y_continuous(labels = scales::comma)+
@@ -65,6 +72,7 @@ ggplot(data, aes(x = `Year`, y = `Total Environmental Cost`)) +
   theme(axis.title.x = element_text(margin = margin(t = 10)),  
         axis.title.y = element_text(margin = margin(r = 10)))
 
+#plot4
 ggplot(data, aes(x = `Total Environmental Intensity in % (Revenue)`, 
                  y = `Total Environmental Cost`,
                  size = `Total Environmental Intensity in % (Operating Income)`)) +
