@@ -1,0 +1,194 @@
+---
+title: "Decoding the Corporate Environmental Footprint: A Visual Exploration"
+author: "Shruti Sharma"
+date: "2024-10-05"
+output: pdf_document
+urlcolor: blue
+---
+
+
+# Abstract
+
+The project investigates the relationship between corporate environmental footprints and financial performance.
+It finds that there is generally a positive trend in how companies manage their environmental costs relative to their revenues and operating income. The study ends with discussing some generic ways that different economic units can adopt to manage environmental costs along with sustainable financial growth.
+
+# Introduction
+
+The corporate world is at a crossroads. As the planet’s resources dwindle and climate change intensifies,
+companies are under increasing scrutiny for their environmental footprint. Quantifying this footprint in
+monetary terms gives a clearer picture of its scale and economic implications. We use that information to
+understand and highlight the corporate contribution to ecological damage.
+
+# Data Description
+
+The dataset monetizes corporate environmental costs to quantify their financial significance. Some of the
+key variables include:
+
+* _Year:_ The year in which the environmental cost was incurred by the firm’s operations.
+* _Company Name:_ Name of the companies involved in the study.
+* _Country:_ The country in which the companies’ headquarters are located.
+* _Industry:_ The Exiobase industry category to which the firm belongs.
+* _Total Environmental Intensity (Revenue):_ The monetized environmental impact of the firm’s operations
+divided by revenue.
+* _Total Environmental Intensity (Operating Income):_ The monetized environmental impact of the firm’s
+operations divided by operating income.
+* _Total Environmental Cost:_ The total monetized environmental impact of the firm’s operations.
+
+The data also includes information on certain safeguard subjects assessed to better understand the effects of
+corporate activities on the environment. However, we will only be using selected columns for our analysis.
+
+Source: [Kaggle](https://www.kaggle.com/datasets/mannmann2/corporate-environmental-impact)
+
+# Exploratory Data Analysis
+
+Let’s begin our analysis by viewing the companies’ total environmental impact relative to their revenue.
+This metric tells us how efficiently companies generate revenue while managing environmental costs.
+
+
+
+```{r startup, echo=FALSE, warning=FALSE, message=FALSE,fig.margin=c(2, 0, 2, 0)}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(knitr)
+library(scales)
+
+
+data<-read.csv("C:\\Users\\SHRUTI\\ShrutiWork\\CMI Sem 1\\R dashboard\\final_raw_sample_0_percent.csv")
+
+#data cleaning
+
+data <- data %>%
+  rename("Company Name"="Company.Name",
+         "Exiobase industry category" = "Industry..Exiobase.",
+         "Total Environmental Intensity in % (Revenue)" = "Total.Environmental.Intensity..Revenue.",
+         "Total Environmental Intensity in % (Operating Income)" = "Total.Environmental.Intensity..Operating.Income.",
+         "Total Environmental Cost" = "Total.Environmental.Cost",
+         "Working Capacity" ="Working.Capacity",
+         "Fish Production Capacity" = "Fish.Production.Capacity",                                     
+         "Crop Production Capacity" = "Crop.Production.Capacity",                                     
+         "Meat Production Capacity" = "Meat.Production.Capacity",                                  
+         "Abiotic Resources" = "Abiotic.Resources",
+         "Water Production Capacity" = "Water.production.capacity..Drinking.water...Irrigation.Water.",
+         "Wood Production Capacity" = "Wood.Production.Capacity",
+         "% Imputed" = "X..Imputed")
+
+data <- data %>%
+  mutate(across(c("Total Environmental Intensity in % (Revenue)",
+                  "Total Environmental Intensity in % (Operating Income)",
+                  "% Imputed"), 
+                ~ as.numeric(gsub("%", "", .))))
+
+data <- data %>%
+  mutate(across(c("Total Environmental Cost",                             
+                  "Working Capacity",                                     
+                  "Fish Production Capacity",                             
+                  "Crop Production Capacity",                             
+                  "Meat Production Capacity",                             
+                  "Biodiversity",                                         
+                  "Abiotic Resources",                                    
+                  "Water Production Capacity",                            
+                  "Wood Production Capacity"),
+                ~as.numeric(gsub("\\((.*?)\\)", "-\\1", gsub(",", "", .)))))
+
+data <- na.omit(data)
+
+#data visualisation
+
+#plot1
+ggplot(data, aes(x = `Total Environmental Intensity in % (Revenue)`)) +
+  geom_histogram(binwidth = 0.5,fill="lightblue",color="black",alpha=0.7) +
+  labs(title = "Distribution of Total Environmental Intensity (Revenue)",
+       x = "Intensity (% of Revenue)", y = "Frequency") +
+  xlim(-20, 5) +theme_minimal()+
+  theme(axis.title.x = element_text(margin = margin(t = 10)),  
+        axis.title.y = element_text(margin = margin(r = 10)))
+```
+
+
+This plot shows the companies’ total environmental impact relative to their revenue. This metric tells us how efficiently companies generate revenue while managing environmental costs.
+
+We notice that most values of Total Environmental Intensity (as a percentage of revenue) are centered in closer to 0 and on the negative side. A negative Total Environmental Intensity value indicates that, on average, most companies are offsetting the environmental costs by a small margin. They might be using resources efficiently or adopting effective environmental management practices. Conversely, they could be reporting negative intensity values without accounting for certain environmental impacts.
+
+
+```{r startup2, echo=FALSE, warning=FALSE,fig.margin=c(2, 0, 2, 0)}
+#plot2
+ggplot(data, aes(x = `Total Environmental Intensity in % (Operating Income)`)) +
+  geom_histogram(binwidth = 0.5,fill = "seagreen1", color = "black", alpha = 0.7) +
+  labs(title = "Distribution of Total Environmental Intensity (Operating Income)",
+       x = "Intensity", y = "Frequency") +
+  xlim(-50, 5) +theme_minimal()+
+  theme(axis.title.x = element_text(margin = margin(t = 10)),  
+        axis.title.y = element_text(margin = margin(r = 10)))
+```
+
+
+This plot shows how the Total Environmental Intensity (as a percentage of Operating Income) is distributed in our dataset.
+
+We observe that most values of Total Environmental Intensity (as a percentage of Operating income) are also centered near 0. A value closer to 0% means the firm’s environmental cost offsets are a small percentage of their operating income. As such, the companies are managing their resources well by adopting renewable and environmental practices.
+
+
+```{r startup3, echo=FALSE,warning=FALSE,fig.margin=c(2, 0, 2, 0)}
+#plot3
+ggplot(data, aes(x = `Year`, y = `Total Environmental Cost`)) +
+  geom_line(stat = "summary", fun = "mean",color="slateblue4") +
+  scale_y_continuous(labels = scales::comma)+
+  labs(title = "Average Environmental Cost Over Time",
+       x = "Year", y = "Average Environmental Cost")+theme_minimal()+
+  theme(axis.title.x = element_text(margin = margin(t = 10)),  
+        axis.title.y = element_text(margin = margin(r = 10)))
+```
+
+
+This plot shows how the total environmental cost has changed over time. Positive values represent sectors with high environmental harm due to resource extraction, pollution, and intensive energy consumption (e.g., mining, quarrying). Negative values represent sectors where environmental impacts are mitigated, offset, or reduced, potentially due to sustainability initiatives, financial incentives, or green practices (e.g., telecommunications, insurance).
+
+On an average the companies have been able to offset the total monetised environmental costs. However till 2016, the offset has kept on decreasing possibly due to increased industrialisation, rapid urbanization and relaxed environment regulations in many countries. While post 2016, the shift towards renewable energy sources, stricter emission standards and advancements in pollution control technologies has helped offset more environmental costs over the year on average.
+
+
+```{r startup4, echo=FALSE,warning=FALSE,fig.margin=c(2, 0, 2, 0)}
+ggplot(data, aes(x = `Total Environmental Intensity in % (Revenue)`, 
+                 y = `Total Environmental Cost`,
+                 size = `Total Environmental Intensity in % (Operating Income)`)) +
+  geom_point(alpha = 0.7,shape=21,fill="lightpink",color="hotpink3",stroke=0.4) +
+  labs(title = "Environmental Cost vs. Total Environmental Intensities", 
+       x = "Total Environmental Intensity (% of Revenue)", 
+       y = "Total Environmental Cost") +
+  theme_minimal() +
+  scale_size_continuous(name = "Intensity (% of Operating Income)",labels=label_number())+
+  scale_y_continuous(labels = label_number()) +
+  scale_x_continuous(labels = label_number())+
+  theme(axis.title.x = element_text(margin = margin(t = 10)),  
+        axis.title.y = element_text(margin = margin(r = 10)))
+```
+
+
+This plot compares the Total Environmental Intensities (both as a percentage of revenue and operating income) with Total Environmental Cost. It helps us identify patterns in how companies’ environmental costs scale with their operational and financial metrics
+
+Most companies are, on average, generating revenue and operating income that significantly exceed their environmental costs, meaning they are spending less on environmental costs than what they generate in revenue. This confirms previous observations that many firms are effectively managing their environmental impact relative to their economic outputs.
+
+A small cluster of high environmental cost companies shows up as outliers on the plot, suggesting large companies or industries with significant environmental impacts (e.g., mining, energy, chemicals).
+
+
+\newpage
+
+# Results
+
+The analysis reveals a generally positive trend in how companies manage their environmental costs relative to their revenues and operating income. Most companies are reporting negative Total Environmental Intensity values, indicating that they generate higher revenue relative to the environmental costs they incur. This suggests effective environmental management practices or efficient resource use. However, while many companies seem to manage their environmental costs well, there could be risks of underreporting, regulatory shifts, or industry biases impacting these results.
+
+# Discussion
+
+1. Countries with higher environmental intensities may need to take immediate steps to adopt more sustainable practices or strengthen environmental regulations. On the other hand, countries with lower environmental intensities can serve as benchmarks for sustainable development.
+
+2. Industries should focus on reducing their environmental intensities by adopting cleaner production methods, improving energy efficiency, and emphasizing waste reduction. These steps are essential not just for meeting regulatory requirements but also for long-term financial viability.
+
+3. Governments and corporations should explore incentives for transitioning to renewable energy technologies such as solar and wind. These technologies can significantly lower environmental costs in the long run and mitigate the financial risks associated with future regulations and resource scarcity.
+
+4. There is also a need for investment in research and development to foster innovations that reduce environmental impacts, such as sustainable materials, pollution control technologies, and improvements in environmental monitoring.
+
+5. Public awareness campaigns can help drive consumer demand for environmentally responsible products and services. Educating consumers about the importance of sustainability will build market pressure for companies to adopt greener practices.
+
+# Conclusion
+
+There was no way to explicitly validate the data and the unusual distribution of values so close to 0 suggesting that most companies are offsetting their environmental cost. The data could be focusing on certain specialised industries where this pattern is applicable. 
+
+Or, maybe the dataset was created for a specific project or research focusing on certain industries. Further research is required to understand the sectoral and regional factors influencing environmental costs. A deeper exploration of these dynamics will allow targeted interventions to address the challenges.
